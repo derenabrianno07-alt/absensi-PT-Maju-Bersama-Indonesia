@@ -36,7 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt_tok->bind_param("ssi", $token, $expiry, $user_id);
         $stmt_tok->execute();
         
-        $reset_link = "http://" . $_SERVER['HTTP_HOST'] . "/absensi/auth/reset-password.php?token=" . $token;
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $reset_link = $protocol . "://" . $_SERVER['HTTP_HOST'] . "/auth/reset-password.php?token=" . $token;
         
         // Check if SMTP is configured (not using default values)
         if (defined('SMTP_USER') && SMTP_USER !== 'your_email@gmail.com' && SMTP_USER !== '') {
