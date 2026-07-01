@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Construct new file content for config/database.php
     $content = "<?php
+ob_start();
 // config/database.php
 // =========================================================================
 // PENGATURAN KREDENSIAL DATABASE (Silakan isi manual sesuai database Anda)
