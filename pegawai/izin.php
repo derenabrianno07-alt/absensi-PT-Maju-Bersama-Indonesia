@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'add') {
     }
     
     $stmt = $conn->prepare("INSERT INTO izin (pegawai_id, tanggal_mulai, tanggal_selesai, jenis, alasan, file_surat, status) VALUES (?, ?, ?, ?, ?, ?, 'Pending')");
-    $stmt->bind_param("issssss", $pegawai_id, $tanggal_mulai, $tanggal_selesai, $jenis, $alasan, $file_surat);
+    $stmt->bind_param("isssss", $pegawai_id, $tanggal_mulai, $tanggal_selesai, $jenis, $alasan, $file_surat);
     
     if ($stmt->execute()) {
         set_alert('success', 'Berhasil!', 'Pengajuan izin berhasil dikirim.');
