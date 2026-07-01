@@ -1,0 +1,113 @@
+/* assets/css/animations.css */
+
+/* Fade In page transition */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Spinner Rotate */
+.spinner-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Skeleton Loading Effect */
+.skeleton {
+    background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Digital Clock Glow */
+.clock-glow {
+    text-shadow: 0 0 10px rgba(37, 99, 235, 0.15);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Pulse animation for active camera / indicators */
+.pulse-green {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    animation: pulseG 1.6s infinite;
+    border-radius: 50%;
+}
+
+@keyframes pulseG {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+/* Camera box layout and animation */
+.camera-container {
+    position: relative;
+    border-radius: var(--rounded-val);
+    overflow: hidden;
+    background: #000;
+    border: 3px solid var(--border-color);
+    box-shadow: var(--shadow-soft);
+    margin: 0 auto;
+    max-width: 480px;
+    aspect-ratio: 4/3;
+}
+
+.camera-shutter-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #FFF;
+    opacity: 0;
+    z-index: 100;
+}
+
+.camera-shutter-flash.flash-active {
+    animation: flashAnim 0.3s ease-out;
+}
+
+@keyframes flashAnim {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+    100% { opacity: 0; }
+}
