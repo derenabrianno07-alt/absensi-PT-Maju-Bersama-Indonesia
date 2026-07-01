@@ -1,6 +1,7 @@
-DROP DATABASE IF EXISTS db_absensi;
-CREATE DATABASE db_absensi;
-USE db_absensi;
+-- DROP DATABASE IF EXISTS db_absensi;
+-- CREATE DATABASE db_absensi;
+-- USE db_absensi;
+
 
 -- Tabel Jabatan
 CREATE TABLE jabatan (
