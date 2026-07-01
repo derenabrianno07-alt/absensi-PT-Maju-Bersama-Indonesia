@@ -1,6 +1,6 @@
 <?php
 // admin/cetak.php
-require_once '../config/connection.php';
+require_once '../config/database.php';
 require_once '../config/session.php';
 require_once '../config/helpers.php';
 check_admin();

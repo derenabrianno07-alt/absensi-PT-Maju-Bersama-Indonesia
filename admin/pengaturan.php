@@ -10,19 +10,58 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nama_perusahaan = sanitize($_POST['nama_perusahaan']);
     $nama_sistem = sanitize($_POST['nama_sistem']);
     
+    global $db_host, $db_port, $db_user, $db_pass, $db_name;
+    
     // Construct new file content for config/database.php
     $content = "<?php
 // config/database.php
-\$host = getenv('MYSQLHOST');
-\$user = getenv('MYSQLUSER');
-\$pass = getenv('MYSQLPASSWORD');
-\$db   = getenv('MYSQLDATABASE');
-\$port = getenv('MYSQLPORT');
+// =========================================================================
+// PENGATURAN KREDENSIAL DATABASE (Silakan isi manual sesuai database Anda)
+// =========================================================================
+\$db_host = '$db_host';
+\$db_port = '$db_port';
+\$db_user = '$db_user';
+\$db_pass = '$db_pass';
+\$db_name = '$db_name';
+// =========================================================================
 
-\$conn = new mysqli(\$host, \$user, \$pass, \$db, (int)\$port);
-if (\$conn->connect_error) {
-    die(\"Koneksi Database Gagal: \" . \$conn->connect_error);
+class Database {
+    private static \$mysqliConn = null;
+    private static \$pdoConn = null;
+
+    public static function getMysqliConnection() {
+        global \$db_host, \$db_user, \$db_pass, \$db_name, \$db_port;
+        if (self::\$mysqliConn === null) {
+            self::\$mysqliConn = new mysqli(\$db_host, \$db_user, \$db_pass, \$db_name, (int)\$db_port);
+            if (self::\$mysqliConn->connect_error) {
+                die(\"Koneksi Database Gagal: \" . self::\$mysqliConn->connect_error);
+            }
+        }
+        return self::\$mysqliConn;
+    }
+
+    public static function getPdoConnection() {
+        global \$db_host, \$db_port, \$db_name, \$db_user, \$db_pass;
+        if (self::\$pdoConn === null) {
+            \$dsn = \"mysql:host=\$db_host;port=\$db_port;dbname=\$db_name;charset=utf8mb4\";
+
+            try {
+                self::\$pdoConn = new PDO(\$dsn, \$db_user, \$db_pass, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ]);
+            } catch (PDOException \$e) {
+                die(\"Koneksi database gagal: \" . \$e->getMessage());
+            }
+        }
+        return self::\$pdoConn;
+    }
 }
+
+// Inisialisasi koneksi MySQLi & PDO global
+\$conn = Database::getMysqliConnection();
+\$pdo = Database::getPdoConnection();
 
 date_default_timezone_set('Asia/Jakarta');
 
