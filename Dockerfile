@@ -6,8 +6,6 @@ WORKDIR /app
 
 COPY . /app
 
-RUN composer install --no-dev --optimize-autoloader
-
 EXPOSE 8080
 
-CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "."]
