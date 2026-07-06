@@ -11,10 +11,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'add') {
     $jenis = sanitize($_POST['jenis']);
     $alasan = sanitize($_POST['alasan']);
     
+    // Server-side validation
+    $start = new DateTime($tanggal_mulai);
+    $end = new DateTime($tanggal_selesai);
+    
+    if ($start > $end) {
+        set_alert('warning', 'Tanggal Tidak Valid!', 'Tanggal mulai harus sebelum atau sama dengan tanggal selesai.');
+        header("Location: izin.php?action=add");
+        exit;
+    }
+    
+    $diff = $start->diff($end)->format("%a") + 1;
+    
+    if ($jenis == 'Izin') {
+        if ($diff > 3) {
+            set_alert('warning', 'Batas Izin Terlampaui!', 'Pengajuan izin hanya diperbolehkan maksimal 3 hari.');
+            header("Location: izin.php?action=add");
+            exit;
+        }
+    }
+    
+    if ($jenis == 'Sakit') {
+        if (!isset($_FILES['file_surat']) || $_FILES['file_surat']['error'] != 0) {
+            set_alert('warning', 'Surat Bukti Wajib!', 'Pengajuan sakit wajib melampirkan surat keterangan dokter / bukti medis.');
+            header("Location: izin.php?action=add");
+            exit;
+        }
+    }
+    
     // Upload surat (opsional / wajib untuk sakit)
     $file_surat = '';
     if (isset($_FILES['file_surat']) && $_FILES['file_surat']['error'] == 0) {
-        $ext = pathinfo($_FILES['file_surat']['name'], PATHINFO_EXTENSION);
+        $ext = strtolower(pathinfo($_FILES['file_surat']['name'], PATHINFO_EXTENSION));
+        $allowed = ['pdf', 'jpg', 'jpeg', 'png'];
+        if (!in_array($ext, $allowed)) {
+            set_alert('warning', 'Format File Salah!', 'Format file bukti harus berupa PDF, JPG, JPEG, atau PNG.');
+            header("Location: izin.php?action=add");
+            exit;
+        }
         $file_surat = 'surat_' . $pegawai_id . '_' . time() . '.' . $ext;
         if (!is_dir('../uploads/izin')) {
             mkdir('../uploads/izin', 0777, true);
@@ -118,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'add') {
         
         <div class="card" style="max-width: 700px;">
             <div class="card-body">
-                <form action="?action=add" method="POST" enctype="multipart/form-data">
+                <form id="formIzin" action="?action=add" method="POST" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Tanggal Mulai</label>
@@ -144,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'add') {
                     </div>
                     
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">Upload Surat Keterangan / Bukti (Format PDF/JPG/PNG)</label>
+                        <label class="form-label fw-semibold" id="file_label">Upload Surat Keterangan / Bukti (Format PDF/JPG/PNG)</label>
                         <input type="file" name="file_surat" class="form-control" accept=".pdf,image/*">
                         <small class="text-muted">Disarankan mengunggah surat keterangan dokter jika mengajukan Sakit.</small>
                     </div>
@@ -153,6 +187,69 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'add') {
                 </form>
             </div>
         </div>
+
+        <script>
+        document.getElementById('formIzin').addEventListener('submit', function(e) {
+            const tglMulai = this.querySelector('input[name="tanggal_mulai"]').value;
+            const tglSelesai = this.querySelector('input[name="tanggal_selesai"]').value;
+            const jenis = this.querySelector('select[name="jenis"]').value;
+            const fileSurat = this.querySelector('input[name="file_surat"]').files[0];
+            
+            const start = new Date(tglMulai);
+            const end = new Date(tglSelesai);
+            
+            if (start > end) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tanggal Tidak Valid!',
+                    text: 'Tanggal mulai harus sebelum atau sama dengan tanggal selesai.',
+                    confirmButtonColor: '#4361ee'
+                });
+                return;
+            }
+            
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            
+            if (jenis === 'Izin' && diffDays > 3) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Batas Izin Terlampaui!',
+                    text: 'Pengajuan izin hanya diperbolehkan maksimal 3 hari saja.',
+                    confirmButtonColor: '#4361ee'
+                });
+                return;
+            }
+            
+            if (jenis === 'Sakit' && !fileSurat) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Surat Bukti Wajib!',
+                    text: 'Pengajuan sakit wajib melampirkan surat keterangan dokter / bukti medis.',
+                    confirmButtonColor: '#4361ee'
+                });
+                return;
+            }
+        });
+
+        // Add dynamic placeholder/requirements change
+        const jenisSelect = document.querySelector('select[name="jenis"]');
+        const fileLabel = document.getElementById('file_label');
+        
+        jenisSelect.addEventListener('change', function() {
+            if (this.value === 'Sakit') {
+                fileLabel.innerHTML = 'Upload Surat Keterangan Dokter / Bukti Medis (Format PDF/JPG/PNG) <span class="text-danger">*Wajib</span>';
+            } else {
+                fileLabel.innerHTML = 'Upload Surat Keterangan / Bukti (Format PDF/JPG/PNG) <span class="text-muted">(Opsional)</span>';
+            }
+        });
+        
+        // Trigger initial load label change
+        jenisSelect.dispatchEvent(new Event('change'));
+        </script>
     <?php endif; ?>
 </div>
 

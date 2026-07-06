@@ -5,9 +5,9 @@ require_once 'layout/header.php';
 $pegawai_id = $_SESSION['pegawai_id'];
 $action = $_GET['action'] ?? 'list';
 
-// Get current sisa cuti: query the latest record, if none default is 12.
+// Get current sisa cuti: query the latest record, if none default is 20.
 $last_cuti = $conn->query("SELECT sisa_cuti FROM cuti WHERE pegawai_id = $pegawai_id ORDER BY id DESC LIMIT 1")->fetch_assoc();
-$current_sisa_cuti = $last_cuti ? (int)$last_cuti['sisa_cuti'] : 12;
+$current_sisa_cuti = $last_cuti ? (int)$last_cuti['sisa_cuti'] : 20;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $action == 'add') {
     $tanggal_mulai = sanitize($_POST['tanggal_mulai']);

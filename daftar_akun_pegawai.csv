@@ -1,0 +1,12 @@
+﻿No,"Nama Pegawai",Username,Email,Password,NIP,Role
+1,Administrator,admin,"admin@ptmaju.com (atau n/a)",123456,-,Admin
+2,"Budi Santoso",budi,budi@ptmaju.com,123456,PG001,Pegawai
+3,"Andi Pratama",andi,andi@ptmaju.com,123456,PG002,Pegawai
+4,"Siti Aisyah",siti,siti@ptmaju.com,123456,PG003,Pegawai
+5,"Rudi Hartono",rudi,ryzalzal734@gmail.com,123456,PG004,Pegawai
+6,"Dinda Putri",dinda,dinda@ptmaju.com,123456,PG005,Pegawai
+7,"Fajar Nugroho",fajar,fajar@ptmaju.com,123456,PG006,Pegawai
+8,"Rina Oktavia",rina,rina@ptmaju.com,123456,PG007,Pegawai
+9,"Yoga Saputra",yoga,yoga@ptmaju.com,123456,PG008,Pegawai
+10,"Dewi Lestari",dewi,dewi@ptmaju.com,123456,PG009,Pegawai
+11,"Rizky Maulana",rizky,rizky@ptmaju.com,123456,PG010,Pegawai

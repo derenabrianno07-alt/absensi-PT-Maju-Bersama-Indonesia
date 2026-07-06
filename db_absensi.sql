@@ -80,7 +80,7 @@ CREATE TABLE cuti (
     tanggal_selesai DATE NOT NULL,
     jenis_cuti VARCHAR(50) NOT NULL,
     alasan TEXT,
-    sisa_cuti INT DEFAULT 12,
+    sisa_cuti INT DEFAULT 20,
     status ENUM('Pending','Disetujui','Ditolak') DEFAULT 'Pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (pegawai_id) REFERENCES pegawai(id) ON DELETE CASCADE

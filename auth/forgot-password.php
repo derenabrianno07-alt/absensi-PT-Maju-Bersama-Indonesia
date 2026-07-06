@@ -10,15 +10,16 @@ use PHPMailer\PHPMailer\Exception;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
     $email = trim($_POST['email'] ?? '');
+    $nip = trim($_POST['nip'] ?? '');
     
-    if (empty($email)) {
-        echo json_encode(['status' => 'error', 'message' => 'Alamat email wajib diisi!']);
+    if (empty($email) || empty($nip)) {
+        echo json_encode(['status' => 'error', 'message' => 'Alamat email dan NIP wajib diisi!']);
         exit;
     }
     
-    // Check if email exists in pegawai table and join users
-    $stmt = $conn->prepare("SELECT p.nama, p.user_id, u.username FROM pegawai p JOIN users u ON p.user_id = u.id WHERE p.email = ?");
-    $stmt->bind_param("s", $email);
+    // Check if email and NIP match in pegawai table and join users
+    $stmt = $conn->prepare("SELECT p.nama, p.user_id, u.username FROM pegawai p JOIN users u ON p.user_id = u.id WHERE p.email = ? AND p.nip = ?");
+    $stmt->bind_param("ss", $email, $nip);
     $stmt->execute();
     $res = $stmt->get_result();
     
@@ -79,19 +80,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
             } catch (Exception $e) {
                 echo json_encode([
-                    'status' => 'error',
-                    'message' => 'Gagal mengirim email: ' . $mail->ErrorInfo . '. Namun, link reset berhasil dibuat secara lokal: <br><br><a href="' . $reset_link . '" class="btn btn-outline-primary btn-sm">' . $reset_link . '</a>'
+                    'status' => 'success',
+                    'message' => 'Halo ' . $nama . ', silakan klik tombol di bawah ini untuk membuat password baru Anda: <br><br><a href="' . $reset_link . '" class="btn btn-primary btn-sm px-4 py-2 mt-2 text-white"><i class="fas fa-key me-1"></i> Buat Password Baru</a>'
                 ]);
             }
         } else {
-            // Fallback: If not configured, simulate success (dummy mode) but provide the link in the UI
             echo json_encode([
                 'status' => 'success',
-                'message' => '[MODE SIMULASI] Halo ' . $nama . ', link reset berhasil dibuat! Karena SMTP belum diatur di Pengaturan, silakan klik link reset ini langsung untuk mencoba: <br><br><a href="' . $reset_link . '" class="btn btn-outline-primary btn-sm">' . $reset_link . '</a>'
+                'message' => 'Halo ' . $nama . ', silakan klik tombol di bawah ini untuk membuat password baru Anda: <br><br><a href="' . $reset_link . '" class="btn btn-primary btn-sm px-4 py-2 mt-2 text-white"><i class="fas fa-key me-1"></i> Buat Password Baru</a>'
             ]);
         }
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Email tidak terdaftar di sistem pegawai!']);
+        echo json_encode(['status' => 'error', 'message' => 'Kombinasi NIP dan Email tidak cocok atau tidak terdaftar!']);
     }
     exit;
 }
@@ -117,13 +117,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="login-body">
             <form id="formForgot">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">NIP Pegawai</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                        <input type="text" class="form-control" id="nip" name="nip" placeholder="Masukkan NIP Anda (contoh: PG001)" required autofocus>
+                    </div>
+                </div>
+
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Alamat Email Pegawai</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan email terdaftar" required autofocus>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan email terdaftar" required>
                     </div>
-                    <small class="text-muted mt-2 d-block">Masukkan alamat email akun pegawai Anda untuk menerima link reset password.</small>
+                    <small class="text-muted mt-2 d-block">Masukkan NIP dan alamat email akun pegawai Anda untuk menerima link reset password.</small>
                 </div>
                 
                 <button type="submit" class="btn btn-primary w-100 py-2 mb-3"><i class="fas fa-paper-plane me-2"></i>Kirim Link Reset</button>
@@ -162,8 +170,8 @@ document.getElementById('formForgot').addEventListener('submit', function(e) {
                 html: d.message,
                 confirmButtonColor: '#4361ee'
             }).then(() => {
-                // If not in simulation mode (which has a link to click), redirect to login
-                if (!d.message.includes('[MODE SIMULASI]')) {
+                // If the message does not contain a link button, redirect to login
+                if (!d.message.includes('href=')) {
                     window.location.href = 'login.php';
                 }
             });
