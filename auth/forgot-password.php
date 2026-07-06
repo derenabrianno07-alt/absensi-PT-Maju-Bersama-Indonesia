@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label class="form-label fw-semibold">NIP Pegawai</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                        <input type="text" class="form-control" id="nip" name="nip" placeholder="Masukkan NIP Anda (contoh: PG001)" required autofocus>
+                        <input type="text" class="form-control" id="nip" name="nip" placeholder="Masukkan NIP Anda" required autofocus>
                     </div>
                 </div>
 
